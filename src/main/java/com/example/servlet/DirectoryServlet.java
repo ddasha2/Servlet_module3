@@ -25,7 +25,7 @@ public class DirectoryServlet extends HttpServlet {
             String username = (String) session.getAttribute("username");
             String homeDir = System.getProperty("user.home") + "\\" + "filemanager" + "\\" + username + "\\";
             File homeDirFile = new File(homeDir);
-            String canonicalHomeDir = homeDirFile.getCanonicalPath();
+            String canonicalHomeDir = homeDirFile.getCanonicalPath() + "\\";
             String path = req.getParameter("path");
             File requestedFile;
             if (path == null || path.isEmpty())
@@ -33,9 +33,12 @@ public class DirectoryServlet extends HttpServlet {
             else
                 requestedFile = new File(path);
             String canonicalRequested = requestedFile.getCanonicalPath();
-            if (!canonicalRequested.startsWith(canonicalHomeDir))
+            if (!canonicalRequested.startsWith(canonicalHomeDir)) {
                 requestedFile = homeDirFile;
-
+                path = requestedFile.getAbsolutePath();
+            }
+            else
+                path = canonicalRequested;
 
             File directory = requestedFile;
             if (!directory.exists()) {
