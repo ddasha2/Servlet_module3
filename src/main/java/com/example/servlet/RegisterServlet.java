@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 
 @WebServlet("/register")
@@ -36,7 +35,7 @@ public class RegisterServlet extends HttpServlet {
                 req.setAttribute("error", "Пользователь с таким именем уже существует");
                 req.getRequestDispatcher("/register.jsp").forward(req, resp);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

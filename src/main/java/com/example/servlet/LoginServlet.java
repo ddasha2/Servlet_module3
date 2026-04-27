@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.sql.SQLException;
+
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -39,7 +39,7 @@ public class LoginServlet extends HttpServlet {
                 req.setAttribute("error", "неверное имя пользователя или пароль");
                 req.getRequestDispatcher("/login.jsp").forward(req, resp);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -1,44 +1,33 @@
 package com.example.servlet.models;
 
-import com.example.servlet.dbService.DatabaseConnection;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.example.servlet.dbService.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class UsersDAO {
 
-    public static void addUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getEmail());
-            statement.executeUpdate();
+    public static void addUser(User user) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            session.persist(user);
+            transaction.commit();
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static User getUser(String username) throws SQLException {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return new User(
-                        resultSet.getString("username"),
-                        resultSet.getString("password"),
-                        resultSet.getString("email")
-                );
-            }
+    public static User getUser(String username) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.byNaturalId(User.class).using("username", username).load();
         }
-        return null;
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static boolean validateUser(String username, String password) throws SQLException {
+    public static boolean validateUser(String username, String password) {
         User user = getUser(username);
-        return user != null && user.getPassword().equals(password);
+        return user != null && password.equals(user.getPassword());
     }
 }
